@@ -24,7 +24,7 @@ export default function ProfilePage() {
     async function handleLogout() {
         try {
             await fetch('/api/users/signout', { method: 'POST' });
-            void router.push('/signin');
+            router.push('/signin');
         } catch (error) {
             const err = error as Error;
             console.error('Error in logging out user: ', err.message);
@@ -33,6 +33,15 @@ export default function ProfilePage() {
 
     return (
         <section className="my-8">
+            {!user?.isVerified && (
+                <p className="mb-4 rounded-md bg-yellow-400/50 p-4">
+                    Please verify your account{' '}
+                    <a href="/" className="font-bold underline">
+                        here
+                    </a>
+                    !
+                </p>
+            )}
             <form className="flex flex-col items-start gap-4">
                 <h1 className="text-2xl font-bold capitalize">Profile page</h1>
                 <div className="flex w-full flex-col items-start gap-2">

@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 
 import { connectDB } from '@/config/db';
 import User from '@/models/user';
+import { sendVerifyEmail } from '@/utils/auth';
 
 connectDB();
 
@@ -26,6 +27,10 @@ export async function POST(request: NextRequest) {
             email,
             password: hashedPassword,
         });
+
+        // send verification email
+        const res = await sendVerifyEmail(user.id, user.email, 'VERIFY_EMAIL');
+        console.log('mail res: ', res);
 
         return NextResponse.json({ data: user, error: null }, { status: 201 });
     } catch (error) {

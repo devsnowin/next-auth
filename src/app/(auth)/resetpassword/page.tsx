@@ -1,0 +1,73 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+export default function ResetPasswordPage() {
+    const [token, setToken] = useState('');
+
+    useEffect(() => {
+        const urlToken = window.location.search.split('=')[1];
+        console.log('url token: ', urlToken);
+        setToken(urlToken);
+    }, []);
+
+    const router = useRouter();
+
+    async function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        const formData = new FormData(e.target as HTMLFormElement);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            const res = await fetch('/api/users/resetpassword', {
+                method: 'POST',
+                body: JSON.stringify({ ...data, token }),
+            });
+            if (res.ok) {
+                await fetch('/api/users/signout', { method: 'POST' });
+                router.push('/signin');
+            }
+        } catch (error) {
+            const err = error as Error;
+            console.error(err.message);
+        }
+    }
+
+    return (
+        <section className="my-8" onSubmit={handleSubmit}>
+            <form className="flex flex-col items-start gap-4">
+                <h1 className="text-2xl font-bold">Reset Password</h1>
+
+                <div className="flex w-full flex-col items-start gap-2">
+                    <label htmlFor="password">Password</label>
+                    <input
+                        required
+                        type="password"
+                        name="password"
+                        id="passsword"
+                        className="block w-full rounded-lg border-2 border-gray-300 bg-gray-50 p-2.5 text-sm outline-none transition-colors duration-100 ease-linear focus:border-slate-500 focus:ring-slate-500"
+                        autoComplete="off"
+                    />
+                </div>
+                <div className="flex w-full flex-col items-start gap-2">
+                    <label htmlFor="confirmPassword">Confirm Password</label>
+                    <input
+                        required
+                        type="password"
+                        name="confirmPassword"
+                        id="confirmPassword"
+                        className="block w-full rounded-lg border-2 border-gray-300 bg-gray-50 p-2.5 text-sm outline-none transition-colors duration-100 ease-linear focus:border-slate-500 focus:ring-slate-500"
+                        autoComplete="off"
+                    />
+                </div>
+                <button
+                    type="submit"
+                    className="rounded-md bg-slate-800 px-4 py-2 text-white disabled:cursor-not-allowed"
+                >
+                    Confirm
+                </button>
+            </form>
+        </section>
+    );
+}
