@@ -1,19 +1,54 @@
 'use client';
 
 import Link from 'next/link';
-import React from 'react';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 type AuthFormProps = {
     mode: 'Sign in' | 'Sign up';
 };
 
 export default function AuthForm({ mode }: AuthFormProps) {
-    function handleSubmit(e: React.FormEvent) {
+    const [submiting, setSubmiting] = useState(false);
+    const router = useRouter();
+
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
+        setSubmiting(true);
         const formData = new FormData(e.target as HTMLFormElement);
         const data = Object.fromEntries(formData.entries());
 
-        console.log('data: ', data);
+        switch (mode) {
+            case 'Sign up': {
+                try {
+                    await fetch('/api/users/signup', {
+                        method: 'POST',
+                        body: JSON.stringify(data),
+                    });
+                    router.push('/signin');
+                } catch (error) {
+                    const err = error as Error;
+                    console.error('Error in creating user: ', err.message);
+                }
+                break;
+            }
+            case 'Sign in': {
+                try {
+                    await fetch('/api/users/signin', {
+                        method: 'POST',
+                        body: JSON.stringify(data),
+                    });
+                    router.push('/profile');
+                } catch (error) {
+                    const err = error as Error;
+                    console.error('Error in creating user: ', err.message);
+                }
+                break;
+            }
+            default:
+                break;
+        }
+        setSubmiting(false);
     }
 
     return (
@@ -26,6 +61,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
                 <div className="flex w-full flex-col items-start gap-2">
                     <label htmlFor="name">Name</label>
                     <input
+                        required
                         type="text"
                         name="name"
                         id="name"
@@ -37,6 +73,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
             <div className="flex w-full flex-col items-start gap-2">
                 <label htmlFor="email">Email</label>
                 <input
+                    required
                     type="email"
                     name="email"
                     id="email"
@@ -47,6 +84,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
             <div className="flex w-full flex-col items-start gap-2">
                 <label htmlFor="password">Password</label>
                 <input
+                    required
                     type="password"
                     name="password"
                     id="password"
@@ -55,9 +93,10 @@ export default function AuthForm({ mode }: AuthFormProps) {
             </div>
             <button
                 type="submit"
-                className="rounded-md bg-slate-800 px-4 py-2 text-white"
+                className="rounded-md bg-slate-800 px-4 py-2 text-white disabled:cursor-not-allowed"
+                disabled={submiting}
             >
-                {mode}
+                {submiting ? 'Loading...' : mode}
             </button>
             {mode === 'Sign in' ? (
                 <p>
