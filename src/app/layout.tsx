@@ -13,8 +13,8 @@ export const metadata: Metadata = {
 
 const links: NavItem[] = [
     {
-        title: 'Docs',
-        href: '/docs',
+        title: 'Profile',
+        href: '/profile',
     },
     {
         title: 'Sign In',
