@@ -30,7 +30,6 @@ export async function POST(request: NextRequest) {
 
         // send verification email
         const res = await sendVerifyEmail(user.id, user.email, 'VERIFY_EMAIL');
-        console.log('mail res: ', res);
 
         return NextResponse.json({ data: user, error: null }, { status: 201 });
     } catch (error) {

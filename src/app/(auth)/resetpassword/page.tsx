@@ -8,7 +8,6 @@ export default function ResetPasswordPage() {
 
     useEffect(() => {
         const urlToken = window.location.search.split('=')[1];
-        console.log('url token: ', urlToken);
         setToken(urlToken);
     }, []);
 
